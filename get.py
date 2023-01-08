@@ -7,18 +7,23 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 import time
 import pandas as pd
+import glob
+import os
+from tqdm import tqdm
+import pdb
 
-df = pd.DataFrame(columns=['Question', 'Answer', 'Image'])
+DATA_DIR = "data/male" #Change here
 
-driver = webdriver.Chrome()
-queries = ["能年玲奈","相武紗季"]
-img_folder = "image/female/japan/"
-
-url = "https://images.search.yahoo.com/"
-
-
-
-for q in queries:
+def get_image(q, df, csv_filename):
+    driver = webdriver.Chrome()
+    img_folder = "image/"+csv_filename
+    try:
+        os.mkdir(img_folder)
+    except Exception:
+        pass
+    
+    url = "https://images.search.yahoo.com/"
+    
     driver.get(url)
     search = driver.find_element("name", 'p')
     search.send_keys(q)
@@ -31,17 +36,38 @@ for q in queries:
     time.sleep(3)
     
     images = driver.find_element("id", 'main')
-    img_name = img_folder+q+".png"
+    img_name = img_folder+"/"+q+".png"
     images.screenshot(img_name)
     
     d = pd.DataFrame(data={"Question":["Who is this?"],
                             "Answer":[q],
                             "Image": ['<img src="{0}">'.format(img_name)]})
-    print(d)
-
     df = pd.concat([df,d])
 
-df.to_csv('out.csv', index=False)
+    time.sleep(1)
+
+    return df
+
+filedir = DATA_DIR+"/**/*.txt"
+print(filedir)
+files = glob.glob(filedir)
+print(files)
+csv_filename = ""
+df = pd.DataFrame(columns=['Question', 'Answer', 'Image'])
+
+for filename in files:
+    csv_filename = filename.replace("data/","")
+    csv_filename = csv_filename.replace(".txt","")
+
+    print("working on {0}".format(csv_filename))
+    fin = open(filename).readlines()
+    for name in tqdm(fin):
+        name = name.rstrip()
+        print(name)
+        df = get_image(name, df, csv_filename)
+
+    csv_filename = "data/"+csv_filename+".csv"
+    df.to_csv(csv_filename, index=False)
 
 cmd = "find . -name '*.png' -exec pngquant --ext .png --force {} \;"
 os.system(cmd)
