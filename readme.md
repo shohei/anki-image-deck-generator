@@ -17,5 +17,3 @@ Step 3. run the script
 $ python deck-generator.py
 ```
 
-## TODO
-- Run selenium background

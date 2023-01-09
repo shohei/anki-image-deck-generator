@@ -12,11 +12,15 @@ import os
 from tqdm import tqdm
 import pdb
 import errno
+from selenium.webdriver.chrome.options import Options # オプションを使うために必要
 
 DATA_DIR = "data/male" #Change here
 
+
 def get_image(q, df, csv_filename):
-    driver = webdriver.Chrome()
+    option = Options()                          # オプションを用意
+    option.add_argument('--headless')           # ヘッドレスモードの設定を付与
+    driver = webdriver.Chrome(options=option)   
     img_folder = "image/"+csv_filename
     try:
         print("create folder: {0}".format(img_folder))
