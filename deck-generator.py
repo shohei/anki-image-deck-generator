@@ -11,6 +11,7 @@ import glob
 import os
 from tqdm import tqdm
 import pdb
+import errno
 
 DATA_DIR = "data/male" #Change here
 
@@ -18,8 +19,11 @@ def get_image(q, df, csv_filename):
     driver = webdriver.Chrome()
     img_folder = "image/"+csv_filename
     try:
-        os.mkdir(img_folder)
-    except Exception:
+        print("create folder: {0}".format(img_folder))
+        os.makedirs(img_folder)
+    except OSError as exc:
+        if exc.errno != errno.EEXIST:
+            raise
         pass
     
     url = "https://images.search.yahoo.com/"
@@ -38,6 +42,7 @@ def get_image(q, df, csv_filename):
     images = driver.find_element("id", 'main')
     img_name = img_folder+"/"+q+".png"
     images.screenshot(img_name)
+    print("screenshot saved: {0}".format(img_name))
     
     d = pd.DataFrame(data={"Question":["Who is this?"],
                             "Answer":[q],

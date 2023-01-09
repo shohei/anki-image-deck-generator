@@ -1,0 +1,4 @@
+chromedriver_binary
+pandas
+selenium
+tqdm
