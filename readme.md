@@ -1,9 +1,4 @@
 # Anki image deck generator
-## Prerequisites (python modules)
-- Selenium 
-- Chrome driver binary
-- ...
-
 ## How to use 
 Step 1. Prepare .txt and put it under `data` folder
 
